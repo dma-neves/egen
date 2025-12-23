@@ -1,5 +1,8 @@
-#include "window/Window.h"
+#include "window/Window.hpp"
+#include "renderer/Renderer.hpp"
 
+using namespace egen::window;
+using namespace egen::renderer;
 
 void process_input(GLFWwindow *window)
 {
@@ -11,15 +14,18 @@ int main()
 {
     Window window;
     window.init();
+    Renderer renderer(window);
+
+    renderer.add_triangle();
 
     while(!glfwWindowShouldClose(window.get()))
     {
         process_input(window.get());
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer.update();
 
-        glfwSwapBuffers(window); // Double buffering
         glfwPollEvents();
     }
+
+    return 0;
 }
