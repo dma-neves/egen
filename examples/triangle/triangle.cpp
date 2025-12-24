@@ -1,8 +1,7 @@
 #include "window/Window.hpp"
 #include "renderer/Renderer.hpp"
 
-using namespace egen::window;
-using namespace egen::renderer;
+using namespace egen;
 
 void process_input(GLFWwindow *window)
 {
@@ -16,7 +15,8 @@ int main()
     window.init();
     Renderer renderer(window);
 
-    renderer.add_triangle();
+    //renderer.add_triangle();
+    renderer.add_rectangle();
 
     while(!glfwWindowShouldClose(window.get()))
     {

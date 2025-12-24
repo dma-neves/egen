@@ -1,7 +1,7 @@
 #include "window/Window.hpp"
 #include <iostream>
 
-namespace egen::window
+namespace egen
 {
 
 void Window::framebuffer_size_callback(GLFWwindow* m_window, int width, int height) {

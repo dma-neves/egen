@@ -1,22 +1,23 @@
-#ifndef EGEN_RENDERER_H
-#define EGEN_RENDERER_H
+#pragma once
 
 #include "window/Window.hpp"
 
-namespace egen::renderer
+namespace egen
 {
 
 class Renderer
 {
 public:
-    Renderer(window::Window& window);
+    Renderer(Window& window);
     
     void update();
 
     void add_triangle();
 
+    void add_rectangle();
+
 private:
-    window::Window& m_window;
+    Window& m_window;
 
     const char *m_vertex_shader_source = "#version 330 core\n"
                                     "layout (location = 0) in vec3 aPos;\n"
@@ -31,9 +32,12 @@ private:
                                     "{\n"
                                     "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                     "}\0";
+
+    unsigned int shaderProgram;
+    unsigned int shaderProgram2;
+    unsigned int VAO;
+    unsigned int VAO2;
+
 };
 
 }
-
-
-#endif //EGEN_RENDERER_H

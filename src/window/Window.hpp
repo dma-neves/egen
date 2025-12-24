@@ -1,10 +1,9 @@
-#ifndef EGEN_WINDOW_H
-#define EGEN_WINDOW_H
+#pragma once
 
 #include "opengl/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 
-namespace egen::window
+namespace egen
 {
 
 class Window 
@@ -22,5 +21,3 @@ private:
 };
 
 }
-
-#endif //EGEN_WINDOW_H
