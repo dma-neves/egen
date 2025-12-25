@@ -9,15 +9,17 @@ void process_input(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 }
 
-GLuint get_triangle_vao()
+GLuint get_rectangle_vao()
 {
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+         0.5f,  0.5f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f   // top left 
     };
-    unsigned int indices[] = {
-        0, 1, 2
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
     };
 
     GLuint VBO, EBO, VAO;
@@ -37,7 +39,7 @@ GLuint get_triangle_vao()
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbind VBO
-    glBindVertexArray(0);               // Unvind VAO
+    glBindVertexArray(0);               // Unbind VAO
 
     return VAO;
 }
@@ -48,14 +50,14 @@ int main(int argc, char* argv[])
     window.init();
     Renderer renderer(window);
 
-    std::filesystem::path vertex_shader_path = "../examples/triangle/shaders/triangle.vert";
-    std::filesystem::path fragment_shader_path = "../examples/triangle/shaders/triangle.frag";
+    std::filesystem::path vertex_shader_path = "../examples/rectangle/shaders/rectangle.vert";
+    std::filesystem::path fragment_shader_path = "../examples/rectangle/shaders/rectangle.frag";
 
     Shader shader(vertex_shader_path, fragment_shader_path);
 
-    Renderer::Command triangle_render_command{
-        .vao = get_triangle_vao(),
-        .index_count = 3,
+    Renderer::Command rectangle_render_command{
+        .vao = get_rectangle_vao(),
+        .index_count = 6,
         .shader = &shader,
         .texture = nullptr
     };
@@ -64,7 +66,7 @@ int main(int argc, char* argv[])
     {
         process_input(window.get());
 
-        renderer.add_render_command(triangle_render_command);
+        renderer.add_render_command(rectangle_render_command);
         renderer.render();
 
         glfwPollEvents();

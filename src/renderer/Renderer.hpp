@@ -1,6 +1,10 @@
 #pragma once
 
 #include "window/Window.hpp"
+#include "renderer/Shader.hpp"
+#include "renderer/Texture.hpp"
+
+#include <queue>
 
 namespace egen
 {
@@ -8,35 +12,23 @@ namespace egen
 class Renderer
 {
 public:
+    struct Command
+    {
+        uint32_t vao;
+        uint32_t index_count;
+        Shader* shader;
+        Texture* texture;
+        //glm::mat4 transform;
+    };
+
     Renderer(Window& window);
-    
-    void update();
 
-    void add_triangle();
-
-    void add_rectangle();
+    void add_render_command(Command render_command);
+    void render();
 
 private:
     Window& m_window;
-
-    const char *m_vertex_shader_source = "#version 330 core\n"
-                                    "layout (location = 0) in vec3 aPos;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                    "}\0";
-
-    const char* m_fragment_shader_source = "#version 330 core\n"
-                                    "out vec4 FragColor;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                    "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                    "}\0";
-
-    unsigned int shaderProgram;
-    unsigned int shaderProgram2;
-    unsigned int VAO;
-    unsigned int VAO2;
+    std::queue<Command> m_render_command_queue;
 
 };
 

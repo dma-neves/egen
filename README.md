@@ -16,3 +16,12 @@ libxcursor-dev
 libxkbcommon-dev
 libwayland-dev
 ```
+
+## Build
+
+```sh
+mkdir build
+cd build
+cmake ..
+make
+```
