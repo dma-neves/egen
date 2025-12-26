@@ -3,12 +3,6 @@
 
 using namespace egen;
 
-void process_input(GLFWwindow *window)
-{
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
 GLuint get_triangle_vao()
 {
     float vertices[] = {
@@ -44,7 +38,12 @@ GLuint get_triangle_vao()
 
 int main(int argc, char* argv[]) 
 {
-    Window window;
+    auto key_input_callback = [](GLFWwindow* window){
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
+    };
+
+    Window window(key_input_callback);
     window.init();
     Renderer renderer(window);
 
@@ -60,10 +59,10 @@ int main(int argc, char* argv[])
         .texture = nullptr
     };
 
-    while(!glfwWindowShouldClose(window.get()))
+    while(!window.should_close())
     {
-        process_input(window.get());
-
+        window.process_inputs();
+        
         renderer.add_render_command(triangle_render_command);
         renderer.render();
 

@@ -7,6 +7,7 @@ build-essential
 cmake
 pkg-config
 libglfw3-dev
+libglm-dev
 libgl1-mesa-dev
 libx11-dev
 libxi-dev

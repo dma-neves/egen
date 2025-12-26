@@ -1,8 +1,11 @@
 #include "window/Window.hpp"
-#include <iostream>
 
 namespace egen
 {
+
+Window::Window(std::function<void(GLFWwindow *window)> key_input_callback) : m_key_input_callback(key_input_callback)
+{
+}
 
 void Window::framebuffer_size_callback(GLFWwindow* m_window, int width, int height) {
 
@@ -15,7 +18,8 @@ int Window::init()
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL features without backwards-compatible features we no longer need.
+    // Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL features without backwards-compatible features we no longer need.
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // used for mac os
 
@@ -23,7 +27,7 @@ int Window::init()
 
     if (m_window == NULL)
     {
-        std::cout << "Failed to create GLFW m_window" << std::endl;
+        throw std::runtime_error("Failed to create GLFW m_window");
         glfwTerminate();
         return -1;
     }
@@ -33,13 +37,15 @@ int Window::init()
     // GLAD solves this for us
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        throw std::runtime_error("Failed to initialize GLAD");
         return -1;
     }
 
     glViewport(0, 0, 800, 600); // viewport is used to transform Normalized Device Coordinates (NDC) to screen coordinates
 
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback); // Callback for change in m_window size
+
+    glEnable(GL_DEPTH_TEST); // Enable depth testing
 
     return 0;
 }
@@ -53,5 +59,16 @@ GLFWwindow* Window::get()
 {
     return m_window;
 }
+
+bool Window::should_close()
+{
+    return glfwWindowShouldClose(m_window);
+}
+
+void Window::process_inputs()
+{
+    m_key_input_callback(m_window);
+}
+
 
 }

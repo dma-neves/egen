@@ -69,9 +69,11 @@ Shader::Shader(const std::filesystem::path& vertex_shader_path, const std::files
         throw std::runtime_error(std::string("Failed to link shader program: ") + info_log);
 
     }
-    glUseProgram(m_shader_program); // Activate the Shader Program
+    // Activate the Shader Program
+    glUseProgram(m_shader_program);
+    // After the shaders have been linked to the program, we can delete them
     glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader); // After the shaders have been linked to the program, we can delete them
+    glDeleteShader(fragment_shader);
 }
 
 GLuint Shader::get_shader_program()
