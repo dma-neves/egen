@@ -2,7 +2,6 @@
 #include "renderer/Renderer.hpp"
 #include "cube_data.hpp"
 
-#include "opengl/glad/include/glad/glad.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -22,10 +21,10 @@ static void process_input(GLFWwindow *window, float& angle_x, float& angle_y)
     if(glfwGetKey(window, GLFW_KEY_RIGHT))
         angle_y += angle_increment;
 
-    if(glfwGetKey(window, GLFW_KEY_UP))
+    if(glfwGetKey(window, GLFW_KEY_DOWN))
         angle_x -= angle_increment;
 
-    if(glfwGetKey(window, GLFW_KEY_DOWN))
+    if(glfwGetKey(window, GLFW_KEY_UP))
         angle_x += angle_increment;
 }
 
@@ -89,7 +88,7 @@ int main(int argc, char* argv[])
         model_matrix = glm::rotate(model_matrix, glm::radians(angle_x), glm::vec3(1.0f, 0.0f, 0.0f));
         model_matrix = glm::rotate(model_matrix, glm::radians(angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        auto model_matrix_location = glGetUniformLocation(shader.get_shader_program(), "modelMatrix");
+        auto model_matrix_location = glGetUniformLocation(shader.get_shader_program(), "model_matrix");
         glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(model_matrix));
 
         renderer.add_render_command(cube_render_command);
