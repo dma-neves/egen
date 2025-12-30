@@ -76,7 +76,7 @@ Shader::Shader(const std::filesystem::path& vertex_shader_path, const std::files
     glDeleteShader(fragment_shader);
 }
 
-GLuint Shader::get_shader_program()
+GLuint Shader::program()
 {
     return m_shader_program;
 }

@@ -55,6 +55,15 @@ GLuint get_cube_vao()
     return VAO;
 }
 
+glm::mat4 compute_mvp(float angle_x, float angle_y)
+{
+    glm::mat4 mvp = glm::mat4(1.0f);
+    mvp = glm::rotate(mvp, glm::radians(angle_x), glm::vec3(1.0f, 0.0f, 0.0f));
+    mvp = glm::rotate(mvp, glm::radians(angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    return mvp;
+}
+
 int main(int argc, char* argv[]) 
 {
     float angle_x = 0.0f;
@@ -84,15 +93,9 @@ int main(int argc, char* argv[])
     {
         window.process_inputs();
 
-        auto model_matrix = glm::mat4(1.0f);
-        model_matrix = glm::rotate(model_matrix, glm::radians(angle_x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model_matrix = glm::rotate(model_matrix, glm::radians(angle_y), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        auto model_matrix_location = glGetUniformLocation(shader.get_shader_program(), "model_matrix");
-        glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, glm::value_ptr(model_matrix));
-
+        cube_render_command.mvp = compute_mvp(angle_x,  angle_y);
         renderer.add_render_command(cube_render_command);
-        renderer.render();
+        renderer.flush();
 
         glfwPollEvents();
     }

@@ -22,13 +22,13 @@ public:
         uint32_t index_count;
         Shader* shader;
         Texture* texture;
-        // glm::mat4 mvp;
+        glm::mat4 mvp{1.0f};
     };
 
     Renderer(Window& window);
 
     void add_render_command(Command render_command);
-    void render();
+    void flush();
 
 private:
     Window& m_window;

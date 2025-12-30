@@ -14,7 +14,7 @@ class Shader
 public:
     Shader(const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path);
 
-    GLuint get_shader_program();
+    GLuint program();
 
 private:
     GLuint m_shader_program;

@@ -62,9 +62,9 @@ int main(int argc, char* argv[])
     while(!window.should_close())
     {
         window.process_inputs();
-        
+
         renderer.add_render_command(triangle_render_command);
-        renderer.render();
+        renderer.flush();
 
         glfwPollEvents();
     }
