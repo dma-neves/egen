@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <cstdint>
 
-#include "opengl/glad/include/glad/glad.h"
+#include "platform/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 
 namespace egen

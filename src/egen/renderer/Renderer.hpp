@@ -1,8 +1,8 @@
 #pragma once
 
-#include "window/Window.hpp"
-#include "renderer/Shader.hpp"
-#include "renderer/Texture.hpp"
+#include "egen/window/Window.hpp"
+#include "egen/renderer/Shader.hpp"
+#include "egen/renderer/Texture.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

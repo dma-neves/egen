@@ -1,5 +1,5 @@
-#include "window/Window.hpp"
-#include "renderer/Renderer.hpp"
+#include "egen/window/Window.hpp"
+#include "egen/renderer/Renderer.hpp"
 #include "cube_data.hpp"
 
 #include <glm/glm.hpp>

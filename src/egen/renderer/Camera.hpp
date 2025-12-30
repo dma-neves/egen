@@ -2,5 +2,10 @@
 
 namespace egen
 {
-    class Texture{};
+
+class Camera
+{
+
+};
+
 }

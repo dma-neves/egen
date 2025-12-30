@@ -1,10 +1,8 @@
-#include "renderer/Shader.hpp"
+#include "egen/renderer/Shader.hpp"
 
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-
-#include <iostream>
 
 namespace egen
 {

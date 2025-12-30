@@ -1,4 +1,4 @@
-#include "window/Window.hpp"
+#include "egen/window/Window.hpp"
 
 namespace egen
 {

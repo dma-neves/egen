@@ -1,6 +1,4 @@
-#include "renderer/Renderer.hpp"
-
-#include <iostream>
+#include "egen/renderer/Renderer.hpp"
 
 namespace egen
 {
