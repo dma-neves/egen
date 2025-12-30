@@ -3,12 +3,12 @@
 namespace egen
 {
 
-Window::Window(std::function<void(GLFWwindow *window)> key_input_callback) : m_key_input_callback(key_input_callback)
+Window::Window(float width, float height) : m_width(width), m_height(height)
 {
 }
 
-void Window::framebuffer_size_callback(GLFWwindow* m_window, int width, int height) {
-
+void Window::framebuffer_size_callback(GLFWwindow* m_window, int width, int height) 
+{
     glViewport(0, 0, width, height);
 }
 
@@ -23,7 +23,7 @@ int Window::init()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // used for mac os
 
-    m_window = glfwCreateWindow(800, 600, "Learn OpenGl", NULL, NULL);
+    m_window = glfwCreateWindow(m_width, m_height, "Learn OpenGl", NULL, NULL);
 
     if (m_window == NULL)
     {
@@ -41,11 +41,28 @@ int Window::init()
         return -1;
     }
 
-    glViewport(0, 0, 800, 600); // viewport is used to transform Normalized Device Coordinates (NDC) to screen coordinates
+    glViewport(0, 0, m_width, m_height); // viewport is used to transform Normalized Device Coordinates (NDC) to screen coordinates
 
     glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback); // Callback for change in m_window size
 
     glEnable(GL_DEPTH_TEST); // Enable depth testing
+
+    glfwSetWindowUserPointer(m_window, this); // Bind this pointer to window user pointer
+
+    glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int focused) { // Callback when window comes to focus
+        auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        if (focused)
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+            self->m_reset_mouse_delta = true;
+            self->m_focused = true;
+        }
+        else
+        {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            self->m_focused = false;
+        }
+    });
 
     return 0;
 }
@@ -60,14 +77,70 @@ GLFWwindow* Window::get()
     return m_window;
 }
 
+
+void Window::set_key_input_callback(std::function<void(GLFWwindow*)> key_input_callback)
+{
+    m_key_input_callback = key_input_callback;
+}
+
+void Window::set_mouse_input_callback(std::function<void(GLFWwindow* window, float x, float y, float dx, float dy)> mouse_input_callback)
+{
+    m_mouse_input_callback = mouse_input_callback;
+
+    glfwSetCursorPosCallback(m_window, [](GLFWwindow* w, double x, double y) {
+        auto* self = static_cast<Window*>(glfwGetWindowUserPointer(w));
+        if (self->m_focused)
+        {
+            float dx ,dy;
+            if(self->m_reset_mouse_delta)
+            {
+                dx = 0.f;
+                dy = 0.f;
+                self->m_reset_mouse_delta = false;
+            }
+            else 
+            {
+                dx = x - self->m_mouse_x;
+                dy = -(y - self->m_mouse_y);
+            }
+
+            self->m_mouse_x = x;
+            self->m_mouse_y = y;
+
+            if(self->m_mouse_input_callback)
+            {
+                self->m_mouse_input_callback(w, x, y, dx, dy);
+            }
+        }
+    });
+}
+
+void Window::set_mouse_anchored(bool anchored)
+{
+    m_mouse_anchored = anchored;
+}
+
 bool Window::should_close()
 {
     return glfwWindowShouldClose(m_window);
 }
 
-void Window::process_inputs()
+void Window::handle_events()
 {
+    glfwPollEvents();
     m_key_input_callback(m_window);
+
+    if(m_mouse_anchored)
+    {
+        center_mouse();
+    }
+}
+
+void Window::center_mouse()
+{
+    glfwSetCursorPos(m_window, m_width / 2.0, m_height / 2.0);
+    m_mouse_x = m_width / 2.0;
+    m_mouse_y = m_height / 2.0;
 }
 
 

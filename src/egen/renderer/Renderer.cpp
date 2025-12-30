@@ -3,7 +3,7 @@
 namespace egen
 {
 
-Renderer::Renderer(Window& window) : m_window(window)
+Renderer::Renderer(Window& window, Camera& camera) : m_window(window), m_camera(camera)
 {
     
 }
@@ -24,7 +24,10 @@ void Renderer::flush()
 
         auto mvp_location = glGetUniformLocation(render_command.shader->program(), "mvp");
         if(mvp_location != -1)
-            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(render_command.mvp));
+        {
+            glm::mat4 mvp = m_camera.compute_mvp(render_command.model);
+            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
+        }
 
         glUseProgram(render_command.shader->program());
         glBindVertexArray(render_command.vao);

@@ -3,6 +3,9 @@
 
 using namespace egen;
 
+#define WIDTH 800
+#define HEIGHT 600
+
 GLuint get_triangle_vao()
 {
     float vertices[] = {
@@ -43,9 +46,11 @@ int main(int argc, char* argv[])
             glfwSetWindowShouldClose(window, true);
     };
 
-    Window window(key_input_callback);
+    Window window(WIDTH, HEIGHT);
+    window.set_key_input_callback(key_input_callback);
     window.init();
-    Renderer renderer(window);
+    Camera camera(WIDTH, HEIGHT);
+    Renderer renderer(window, camera);
 
     std::filesystem::path vertex_shader_path = "../examples/triangle/shaders/triangle.vert";
     std::filesystem::path fragment_shader_path = "../examples/triangle/shaders/triangle.frag";
@@ -61,12 +66,10 @@ int main(int argc, char* argv[])
 
     while(!window.should_close())
     {
-        window.process_inputs();
+        window.handle_events();
 
         renderer.add_render_command(triangle_render_command);
         renderer.flush();
-
-        glfwPollEvents();
     }
 
     return 0;
