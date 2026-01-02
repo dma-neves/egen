@@ -23,7 +23,7 @@ int Window::init()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // used for mac os
 
-    m_window = glfwCreateWindow(m_width, m_height, "Learn OpenGl", NULL, NULL);
+    m_window = glfwCreateWindow(m_width, m_height, "egen", NULL, NULL);
 
     if (m_window == NULL)
     {
