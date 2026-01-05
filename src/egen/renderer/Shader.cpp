@@ -39,7 +39,7 @@ Shader::Shader(const std::filesystem::path& vertex_shader_path, const std::files
     if (!success)
     {
         glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
-        throw std::runtime_error(std::string("Failed to compile vertex shader: ") + info_log);
+        throw std::runtime_error(std::string("Failed to compile vertex shader [") + std::string(vertex_shader_path) + std::string("]") + info_log);
 
     }
 
@@ -52,7 +52,7 @@ Shader::Shader(const std::filesystem::path& vertex_shader_path, const std::files
     if (!success)
     {
         glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
-        throw std::runtime_error(std::string("Failed to compile fragment shader: ") + info_log);
+        throw std::runtime_error(std::string("Failed to compile fragment shader [") + std::string(fragment_shader_path) + std::string("]") + info_log);
     }
 
     // Create Shader Program, attach previous shaders, and link the shaders
@@ -77,6 +77,23 @@ Shader::Shader(const std::filesystem::path& vertex_shader_path, const std::files
 GLuint Shader::program()
 {
     return m_shader_program;
+}
+
+void Shader::use()
+{
+    glUseProgram(m_shader_program);
+}
+
+GLint Shader::get_uniform_location(const std::string& name)
+{
+    auto it = m_uniform_cache.find(name);
+    if (it != m_uniform_cache.end()) 
+    {
+        return it->second;
+    }
+    GLint loc = glGetUniformLocation(m_shader_program, name.c_str());
+    m_uniform_cache[name] = loc; // cache -1 too
+    return loc;
 }
 
 }

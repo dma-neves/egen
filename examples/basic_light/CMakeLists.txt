@@ -1,0 +1,2 @@
+add_executable(basic_light basic_light.cpp)
+target_link_libraries(basic_light PRIVATE egen)
