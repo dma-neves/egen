@@ -15,7 +15,7 @@ namespace egen
 class Shader
 {
 public:
-    Shader(const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path);
+    Shader(const std::filesystem::path& common_shader_path, const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path);
 
     GLuint program();
     void use();

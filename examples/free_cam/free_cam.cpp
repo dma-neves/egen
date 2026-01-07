@@ -85,9 +85,10 @@ int main(int argc, char* argv[])
 
     window.set_mouse_anchored(true);
 
+    std::filesystem::path common_shader_path = "../src/egen/shaders";
     std::filesystem::path vertex_shader_path = "../examples/cube/shaders/cube.vert";
     std::filesystem::path fragment_shader_path = "../examples/cube/shaders/cube.frag";
-    Shader shader(vertex_shader_path, fragment_shader_path);
+    Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
     GLuint VAO = get_cube_vao();
 
     Renderer::Command cube_render_command{

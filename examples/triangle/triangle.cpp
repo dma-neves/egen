@@ -52,10 +52,12 @@ int main(int argc, char* argv[])
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
 
+    
+    std::filesystem::path common_shader_path = "../src/egen/shaders";
     std::filesystem::path vertex_shader_path = "../examples/triangle/shaders/triangle.vert";
     std::filesystem::path fragment_shader_path = "../examples/triangle/shaders/triangle.frag";
 
-    Shader shader(vertex_shader_path, fragment_shader_path);
+    Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
 
     Renderer::Command triangle_render_command{
         .vao = get_triangle_vao(),

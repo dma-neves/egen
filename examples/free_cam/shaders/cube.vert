@@ -1,5 +1,7 @@
 #version 330 core
 
+mat4 get_mvp();
+
 layout (location = 0) in vec3 a_pos;
 layout (location = 1) in vec3 a_color;
 
@@ -9,6 +11,6 @@ out vec3 vertex_color;
 
 void main()
 {
-    gl_Position = mvp * vec4(a_pos.x, a_pos.y, a_pos.z, 1.0);
+    gl_Position = get_mvp() * vec4(a_pos.x, a_pos.y, a_pos.z, 1.0);
     vertex_color = a_color;
 }

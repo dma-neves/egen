@@ -111,9 +111,10 @@ int main(int argc, char* argv[])
 
     window.set_mouse_anchored(true);
 
+    std::filesystem::path common_shader_path = "../src/egen/shaders";
     std::filesystem::path cube_vertex_shader_path = "../examples/basic_light/shaders/cube.vert";
     std::filesystem::path cube_fragment_shader_path = "../examples/basic_light/shaders/cube.frag";
-    Shader cube_shader(cube_vertex_shader_path, cube_fragment_shader_path);
+    Shader cube_shader(common_shader_path, cube_vertex_shader_path, cube_fragment_shader_path);
     GLuint cube_vao = get_cube_vao();
 
     glm::mat4 model1 = glm::mat4(1.0f);
@@ -122,7 +123,7 @@ int main(int argc, char* argv[])
 
     std::filesystem::path light_vertex_shader_path = "../examples/basic_light/shaders/light.vert";
     std::filesystem::path light_fragment_shader_path = "../examples/basic_light/shaders/light.frag";
-    Shader light_shader(light_vertex_shader_path, light_fragment_shader_path);
+    Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
     GLuint light_vao = get_light_vao();
 
     glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 2.0f));
@@ -132,9 +133,9 @@ int main(int argc, char* argv[])
     glm::vec3 light_color(1.f, 1.f, 1.f);
 
     light_shader.use();
-    light_shader.set_uniform("light_color", light_color);
+    light_shader.set_uniform("color", light_color);
     cube_shader.use();
-    cube_shader.set_uniform("object_color", glm::vec3(0.8f, 0.6f, 0.3f));
+    cube_shader.set_uniform("color", glm::vec3(0.8f, 0.6f, 0.3f));
     cube_shader.set_uniform("light_color", light_color);
     cube_shader.set_uniform("light_pos", light_pos);
     cube_shader.set_uniform("ambient_strength", 0.1f);

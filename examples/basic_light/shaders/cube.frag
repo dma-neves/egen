@@ -1,22 +1,14 @@
 #version 330 core
 
+vec3 phong_light(vec3 frag_pos, vec3 normal);
+vec3 get_color();
+
 out vec4 frag_color;
 
 in vec3 frag_pos;
 in vec3 normal;
 
-uniform vec3 object_color;
-uniform vec3 light_color;
-uniform vec3 light_pos;
-uniform float ambient_strength;
-
 void main()
 {
-    vec3 ambient = ambient_strength * light_color;
-    vec3 norm = normalize(normal);
-    vec3 light_dir = normalize(light_pos - frag_pos);
-    float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = diff * light_color;
-
-    frag_color = vec4((ambient + diffuse) * object_color, 1.0f);
+    frag_color = vec4(phong_light(frag_pos, normal) * get_color(), 1.0f);
 }

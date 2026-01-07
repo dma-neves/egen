@@ -1,10 +1,11 @@
 #version 330 core
 
-layout (location = 0) in vec3 a_pos;
+mat4 get_mvp();
+mat4 get_model();
 
-uniform mat4 mvp;
+layout (location = 0) in vec3 a_pos;
 
 void main()
 {
-    gl_Position = mvp * vec4(a_pos.x, a_pos.y, a_pos.z, 1.0);
+    gl_Position = get_mvp() * vec4(a_pos, 1.0);
 }
