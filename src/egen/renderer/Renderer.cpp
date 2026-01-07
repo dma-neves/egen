@@ -25,6 +25,7 @@ void Renderer::flush()
 
         render_command.shader->use();
         render_command.shader->set_uniform("mvp", mvp);
+        render_command.shader->set_uniform("model", render_command.model);
         glBindVertexArray(render_command.vao);
         glDrawElements(GL_TRIANGLES, render_command.index_count, GL_UNSIGNED_INT, 0);
     }

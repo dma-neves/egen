@@ -128,12 +128,16 @@ int main(int argc, char* argv[])
     glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 2.0f));
     light_model = glm::scale(light_model, glm::vec3(0.2f));
 
+    glm::vec3 light_pos = glm::vec3(glm::vec4(0.f, 0.f, 0.f, 0.f) * light_model);
     glm::vec3 light_color(1.f, 1.f, 1.f);
 
     light_shader.use();
     light_shader.set_uniform("light_color", light_color);
     cube_shader.use();
+    cube_shader.set_uniform("object_color", glm::vec3(0.8f, 0.6f, 0.3f));
     cube_shader.set_uniform("light_color", light_color);
+    cube_shader.set_uniform("light_pos", light_pos);
+    cube_shader.set_uniform("ambient_strength", 0.1f);
 
     std::vector<Renderer::Command> cube_render_commands = {
         Renderer::Command{

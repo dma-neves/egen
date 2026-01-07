@@ -21,7 +21,7 @@ void set_uniform(const GLint& loc, const T& value)
     if constexpr (std::is_same_v<T, float>)
     {
         glUniform1f(loc, value);
-    } 
+    }
     else if constexpr (std::is_same_v<T, int>)
     {
         glUniform1i(loc, value);
