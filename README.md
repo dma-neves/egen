@@ -1,8 +1,8 @@
 # Egen
 
-Basic C++ 3D Simulator/Game Engine using OpenGL.
+Baisc C++ OpenGL 3D Game Engine.
 
-Work in progress.
+*Work in progress*
 
 ## Dependencies
 
@@ -36,7 +36,7 @@ make
 
 | State | Name                                  | Description                                           |
 |-------|---------------------------------------|-------------------------------------------------------|
-|  ✅   | Window Component                      | Window component that handles key/mouse input         |
+|  ✅   | Window Component                      | Component to draw Window and handle key/mouse input   |
 |  ✅   | Shader Component                      | Component to load & compile shaders                   |
 |  ✅   | Basic Renderer                        | Render Basic VAOs, and handle model matrices          |
 |  ✅   | Camera                                | Camera that handles projection and movement           |
@@ -46,7 +46,9 @@ make
 |       | Complex Object component              | Object component with  hierarchical modeling          |
 |       | ECS                                   | Entity Component System                               |
 |       | Render Components                     | Embed render systems into ECS components              |
-|       | Bounding Box Component                | Add bounding box ECS component                        |
+|       | Control Components                    | Entity movement components                            |
 |       | Basic Physics system and components   | Add basic collisions, gravity, and physics components |
 |       | Advanced Physics systems              | ...                                                   |
 |       | Advanced Lighting                     | Shadows, HDR, etc                                     |
+
+![alt text](other/egen.png)
