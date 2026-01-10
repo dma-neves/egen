@@ -15,5 +15,5 @@ mat4 get_model()
 
 vec3 transform_normal(vec3 normal)
 {
-    return mat3(transpose(inverse(model))) * normal; 
+    return normalize(mat3(transpose(inverse(model))) * normal); 
 }

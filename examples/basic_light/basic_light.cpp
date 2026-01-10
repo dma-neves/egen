@@ -90,6 +90,17 @@ GLuint get_light_vao()
 
     return VAO;
 }
+void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, float dt)
+{
+    float val = 0.7f * dt;
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), val, glm::vec3(0.0f, 1.0f, 0.0f));
+    light_render_command.model = rotation * light_render_command.model;
+
+    glm::vec3 light_pos = glm::vec3(light_render_command.model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+    cube_shader.use();
+    cube_shader.set_uniform("light_pos", light_pos);
+}
 
 int main(int argc, char* argv[]) 
 {
@@ -126,10 +137,10 @@ int main(int argc, char* argv[])
     Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
     GLuint light_vao = get_light_vao();
 
-    glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 2.0f));
+    glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 3.0f));
     light_model = glm::scale(light_model, glm::vec3(0.2f));
 
-    glm::vec3 light_pos = glm::vec3(glm::vec4(0.f, 0.f, 0.f, 0.f) * light_model);
+    glm::vec3 light_pos = glm::vec3(light_model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     glm::vec3 light_color(1.f, 1.f, 1.f);
 
     light_shader.use();
@@ -184,6 +195,8 @@ int main(int argc, char* argv[])
             renderer.add_render_command(render_command);
         }
         renderer.flush();
+
+        rotate_light(cube_render_commands[cube_render_commands.size()-1], cube_shader, dt);
     }
 
     return 0;
