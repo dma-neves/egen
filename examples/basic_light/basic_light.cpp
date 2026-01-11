@@ -49,7 +49,7 @@ void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, 
     glm::vec3 light_pos = glm::vec3(light_render_command.model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
     cube_shader.use();
-    cube_shader.set_uniform("light_pos", light_pos);
+    cube_shader.set_uniform("light.position", light_pos);
 }
 
 int main(int argc, char* argv[]) 
@@ -97,11 +97,10 @@ int main(int argc, char* argv[])
     light_shader.set_uniform("color", light_color);
     cube_shader.use();
     cube_shader.set_uniform("color", glm::vec3(0.8f, 0.6f, 0.3f));
-    cube_shader.set_uniform("light_color", light_color);
-    cube_shader.set_uniform("light_pos", light_pos);
-    cube_shader.set_uniform("ambient_strength", 0.1f);
-    cube_shader.set_uniform("specular_strength", 0.5f);
-    cube_shader.set_uniform("specular_shininess", 32.f);
+    cube_shader.set_uniform("light.ambient", light_color);
+    cube_shader.set_uniform("light.diffuse", light_color);
+    cube_shader.set_uniform("light.specular", light_color);
+    cube_shader.set_uniform("light.position", light_pos);
 
     std::vector<Renderer::Command> cube_render_commands = {
         Renderer::Command{

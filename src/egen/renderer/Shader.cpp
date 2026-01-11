@@ -34,6 +34,12 @@ Shader::Shader(const std::filesystem::path& common_shader_path, const std::files
         compile_shader(GL_FRAGMENT_SHADER, common_light_fragment_shader_path),
         compile_shader(GL_FRAGMENT_SHADER, fragment_shader_path)
     );
+
+    set_uniform("material.ambient", default_ambient);
+    set_uniform("material.diffuse", default_diffuse);
+    set_uniform("material.specular", default_specular);
+    set_uniform("material.shininess", default_shininess);
+
 }
 
 GLuint Shader::compile_shader(GLenum shader_type, const std::filesystem::path& shader_path)

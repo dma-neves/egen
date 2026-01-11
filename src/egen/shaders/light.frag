@@ -1,25 +1,40 @@
 #version 330 core
 
-uniform vec3 light_color;
-uniform vec3 light_pos;
-uniform float ambient_strength;
-uniform float specular_strength;
-uniform float specular_shininess;
+struct Material
+{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+}; 
+
+struct Light
+{
+    vec3 position;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
 uniform vec3 view_pos;
+
+uniform Material material;
+uniform Light light;
 
 vec3 phong_light(vec3 frag_pos, vec3 normal)
 {
-    vec3 ambient = ambient_strength * light_color;
+    vec3 ambient = material.ambient * light.ambient;
 
     vec3 norm = normalize(normal);
-    vec3 light_dir = normalize(light_pos - frag_pos);
+    vec3 light_dir = normalize(light.position - frag_pos);
     float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = diff * light_color;
+    vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, norm);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
-    vec3 specular = specular_strength * spec * light_color;  
+    vec3 specular = light.specular * (spec * material.specular);  
 
     return ambient + diffuse + specular;
 }
