@@ -100,6 +100,8 @@ int main(int argc, char* argv[])
     cube_shader.set_uniform("light_color", light_color);
     cube_shader.set_uniform("light_pos", light_pos);
     cube_shader.set_uniform("ambient_strength", 0.1f);
+    cube_shader.set_uniform("specular_strength", 0.5f);
+    cube_shader.set_uniform("specular_shininess", 32.f);
 
     std::vector<Renderer::Command> cube_render_commands = {
         Renderer::Command{

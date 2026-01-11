@@ -32,6 +32,8 @@ public:
 
     Camera(float width, float height, float fov = DEFAULT_FOV, glm::vec3 position = DEFAULT_POSITION, float translation_speed = DEFAULT_TRANSLATION_SPEED, float rotation_speed = DEFAULT_ROTATION_SPEED);
 
+    glm::vec3 get_position();
+
     void set_viewport(float width, float height);
     void set_fov(float fov);
     void set_translation_speed(float translation_speed);

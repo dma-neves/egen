@@ -20,6 +20,11 @@ Camera::Camera(float width, float height, float fov, glm::vec3 position, float t
     update_view();
 }
 
+glm::vec3 Camera::get_position()
+{
+    return m_position;
+}
+
 void Camera::set_viewport(float width, float height)
 {
     m_width = width;
