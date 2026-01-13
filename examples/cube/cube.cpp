@@ -1,6 +1,6 @@
 #include "egen/window/Window.hpp"
 #include "egen/renderer/Renderer.hpp"
-#include "cube_data.hpp"
+#include "egen/renderer/primitives/cube.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -11,51 +11,24 @@
 
 using namespace egen;
 
-static void process_key_input(GLFWwindow *window, float& angle_x, float& angle_y)
+void process_key_input(Window& window, float& angle_x, float& angle_y)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    if(window.is_key_pressed(Keyboard::Key::Escape))
+        window.close();
 
     constexpr float angle_increment = 2.0f;
 
-    if(glfwGetKey(window, GLFW_KEY_LEFT))
+    if(window.is_key_pressed(Keyboard::Key::Left))
         angle_y -= angle_increment;
 
-    if(glfwGetKey(window, GLFW_KEY_RIGHT))
+    if(window.is_key_pressed(Keyboard::Key::Right))
         angle_y += angle_increment;
 
-    if(glfwGetKey(window, GLFW_KEY_DOWN))
+    if(window.is_key_pressed(Keyboard::Key::Down))
         angle_x += angle_increment;
 
-    if(glfwGetKey(window, GLFW_KEY_UP))
+    if(window.is_key_pressed(Keyboard::Key::Up))
         angle_x -= angle_increment;
-}
-
-GLuint get_cube_vao()
-{
-    GLuint VBO, EBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbind VBO
-    glBindVertexArray(0);               // Unbind VAO
-
-    return VAO;
 }
 
 glm::mat4 compute_model(float angle_x, float angle_y)
@@ -72,12 +45,7 @@ int main(int argc, char* argv[])
     float angle_x = 0.0f;
     float angle_y = 0.0f;
 
-    auto key_input_callback = [&angle_x, &angle_y](GLFWwindow* window) {
-        process_key_input(window, angle_x, angle_y);
-    };
-
     Window window(WIDTH, HEIGHT);
-    window.set_key_input_callback(key_input_callback);
     window.init();
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
@@ -86,10 +54,10 @@ int main(int argc, char* argv[])
     std::filesystem::path vertex_shader_path = "../examples/cube/shaders/cube.vert";
     std::filesystem::path fragment_shader_path = "../examples/cube/shaders/cube.frag";
     Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
-    GLuint VAO = get_cube_vao();
+    GLuint cube_vao = primitives::cube();
 
     Renderer::Command cube_render_command{
-        .vao = VAO,
+        .vao = cube_vao,
         .index_count = 36,
         .shader = &shader,
         .texture = nullptr
@@ -98,6 +66,7 @@ int main(int argc, char* argv[])
     while(!window.should_close())
     {
         window.handle_events();
+        process_key_input(window, angle_x, angle_y);
 
         cube_render_command.model = compute_model(angle_x,  angle_y);
         renderer.add_render_command(cube_render_command);

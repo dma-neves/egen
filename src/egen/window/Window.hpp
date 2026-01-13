@@ -5,6 +5,8 @@
 #include <functional>
 #include <stdexcept>
 
+#include "egen/input/Keyboard.hpp"
+
 namespace egen
 {
 
@@ -18,12 +20,15 @@ public:
     void terminate();
     GLFWwindow* get();
 
-    void set_key_input_callback(std::function<void(GLFWwindow* window)> key_input_callback);
-    void set_mouse_input_callback(std::function<void(GLFWwindow* window, float x, float y, float dx, float dy)> mouse_input_callback);
+    void set_key_input_callback(std::function<void(Keyboard::Key key, Keyboard::Action action, Keyboard::Mods mods)> key_input_callback);
+    void set_mouse_input_callback(std::function<void(float x, float y, float dx, float dy)> mouse_input_callback);
     void set_mouse_anchored(bool anchored);
+    bool is_key_pressed(Keyboard::Key key);
 
     bool should_close();
     void handle_events();
+
+    void close();
 
 private:
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -32,8 +37,8 @@ private:
     GLFWwindow *m_window;
     float m_width;
     float m_height;
-    std::function<void(GLFWwindow* window)> m_key_input_callback;
-    std::function<void(GLFWwindow* window, float x, float y, float dx, float dy)> m_mouse_input_callback;
+    std::function<void(Keyboard::Key key, Keyboard::Action action, Keyboard::Mods mods)> m_key_input_callback;
+    std::function<void(float x, float y, float dx, float dy)> m_mouse_input_callback;
 
     float m_mouse_x;
     float m_mouse_y;

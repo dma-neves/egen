@@ -1,7 +1,6 @@
 #include "egen/window/Window.hpp"
 #include "egen/renderer/Renderer.hpp"
-#include "cube_data.hpp"
-#include "light_data.hpp"
+#include "egen/renderer/primitives/cube.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,25 +12,25 @@
 
 using namespace egen;
 
-static void process_key_input(GLFWwindow *window, Camera& camera, float dt)
+void process_key_input(Window& window, Camera& camera, float dt)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    if(window.is_key_pressed(Keyboard::Key::Escape))
+        window.close();
 
-    if(glfwGetKey(window, GLFW_KEY_A))
+    if(window.is_key_pressed(Keyboard::Key::A))
         camera.translate(Camera::Direction::Right, -dt);
 
-    if(glfwGetKey(window, GLFW_KEY_D))
+    if(window.is_key_pressed(Keyboard::Key::D))
         camera.translate(Camera::Direction::Right, dt);
 
-    if(glfwGetKey(window, GLFW_KEY_S))
+    if(window.is_key_pressed(Keyboard::Key::S))
         camera.translate(Camera::Direction::Front, -dt);
 
-    if(glfwGetKey(window, GLFW_KEY_W))
+    if(window.is_key_pressed(Keyboard::Key::W))
         camera.translate(Camera::Direction::Front, +dt);
 }
 
-static void process_mouse_input(GLFWwindow *window,  double x, double y, double dx, double dy, Camera& camera, float& dt)
+static void process_mouse_input(double x, double y, double dx, double dy, Camera& camera, float& dt)
 {
     float pitch = dt * dy;
     float yaw = dt * dx;
@@ -52,40 +51,13 @@ void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, 
     cube_shader.set_uniform("light.position", light_pos);
 }
 
-int main(int argc, char* argv[]) 
+std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& light_shader)
 {
-    Window window(WIDTH, HEIGHT);
-    window.init();
-    Camera camera(WIDTH, HEIGHT);
-    Renderer renderer(window, camera);
-
-    float dt = 0.f;
-    float last_frame = 0.f;
-
-    window.set_key_input_callback([&camera, &dt](GLFWwindow* window) {
-        process_key_input(window, camera, dt);
-    });
-
-    window.set_mouse_input_callback([&camera, &dt](GLFWwindow* window, float x, float y, float dx, float dy) {
-        process_mouse_input(window, x, y, dx, dy, camera, dt);
-    });
-
-    window.set_mouse_anchored(true);
-
-    std::filesystem::path common_shader_path = "../src/egen/shaders";
-    std::filesystem::path cube_vertex_shader_path = "../examples/basic_light/shaders/cube.vert";
-    std::filesystem::path cube_fragment_shader_path = "../examples/basic_light/shaders/cube.frag";
-    Shader cube_shader(common_shader_path, cube_vertex_shader_path, cube_fragment_shader_path);
-    GLuint cube_vao = get_cube_vao();
+    GLuint cube_vao = primitives::cube();
 
     glm::mat4 model1 = glm::mat4(1.0f);
     glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(1.8f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 model3 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.5f, -0.3f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 0.3f, 0.2f));
-
-    std::filesystem::path light_vertex_shader_path = "../examples/basic_light/shaders/light.vert";
-    std::filesystem::path light_fragment_shader_path = "../examples/basic_light/shaders/light.frag";
-    Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
-    GLuint light_vao = get_light_vao();
 
     glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 3.0f));
     light_model = glm::scale(light_model, glm::vec3(0.2f));
@@ -102,7 +74,7 @@ int main(int argc, char* argv[])
     cube_shader.set_uniform("light.specular", light_color);
     cube_shader.set_uniform("light.position", light_pos);
 
-    std::vector<Renderer::Command> cube_render_commands = {
+    std::vector<Renderer::Command> render_commands = {
         Renderer::Command{
             .vao = cube_vao,
             .index_count = 36,
@@ -125,13 +97,41 @@ int main(int argc, char* argv[])
             .model = model3
         },
         Renderer::Command{
-            .vao = light_vao,
+            .vao = cube_vao,
             .index_count = 36,
             .shader = &light_shader,
             .texture = nullptr,
             .model = light_model
         }
     };
+
+    return render_commands;
+}
+
+int main(int argc, char* argv[]) 
+{
+    Window window(WIDTH, HEIGHT);
+    window.init();
+    Camera camera(WIDTH, HEIGHT);
+    Renderer renderer(window, camera);
+
+    std::filesystem::path common_shader_path = "../src/egen/shaders";
+    std::filesystem::path cube_vertex_shader_path = "../examples/basic_light/shaders/cube.vert";
+    std::filesystem::path cube_fragment_shader_path = "../examples/basic_light/shaders/cube.frag";
+    std::filesystem::path light_vertex_shader_path = "../examples/basic_light/shaders/light.vert";
+    std::filesystem::path light_fragment_shader_path = "../examples/basic_light/shaders/light.frag";
+    Shader cube_shader(common_shader_path, cube_vertex_shader_path, cube_fragment_shader_path);
+    Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
+
+    float dt = 0.f;
+    float last_frame = 0.f;
+
+    window.set_mouse_input_callback([&camera, &dt](float x, float y, float dx, float dy) {
+        process_mouse_input(x, y, dx, dy, camera, dt);
+    });
+    window.set_mouse_anchored(true);
+
+    auto render_commands = get_render_commands(cube_shader, light_shader);
 
     while(!window.should_close())
     {
@@ -140,14 +140,15 @@ int main(int argc, char* argv[])
         last_frame = current_frame;
 
         window.handle_events();
+        process_key_input(window, camera, dt);
 
-        for(auto& render_command : cube_render_commands)
+        for(auto& render_command : render_commands)
         {
             renderer.add_render_command(render_command);
         }
         renderer.flush();
 
-        rotate_light(cube_render_commands[cube_render_commands.size()-1], cube_shader, dt);
+        rotate_light(render_commands[render_commands.size()-1], cube_shader, dt);
     }
 
     return 0;

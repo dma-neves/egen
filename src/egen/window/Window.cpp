@@ -1,4 +1,5 @@
 #include "egen/window/Window.hpp"
+#include "egen/window/details/GlfwConverters.hpp"
 
 namespace egen
 {
@@ -77,12 +78,21 @@ GLFWwindow* Window::get()
 }
 
 
-void Window::set_key_input_callback(std::function<void(GLFWwindow*)> key_input_callback)
+void Window::set_key_input_callback(std::function<void(Keyboard::Key key, Keyboard::Action action, Keyboard::Mods mods)> key_input_callback)
 {
     m_key_input_callback = key_input_callback;
+
+    glfwSetKeyCallback(m_window, [](GLFWwindow* w, int key, int scancode, int action, int mods){
+        auto* self = static_cast<Window*>(glfwGetWindowUserPointer(w));
+        self->m_key_input_callback(
+            details::convert_key(key),
+            details::convert_action(action),
+            details::convert_mods(mods)
+        );
+    });
 }
 
-void Window::set_mouse_input_callback(std::function<void(GLFWwindow* window, float x, float y, float dx, float dy)> mouse_input_callback)
+void Window::set_mouse_input_callback(std::function<void(float x, float y, float dx, float dy)> mouse_input_callback)
 {
     m_mouse_input_callback = mouse_input_callback;
 
@@ -108,7 +118,7 @@ void Window::set_mouse_input_callback(std::function<void(GLFWwindow* window, flo
 
             if(self->m_mouse_input_callback)
             {
-                self->m_mouse_input_callback(w, x, y, dx, dy);
+                self->m_mouse_input_callback(x, y, dx, dy);
             }
         }
     });
@@ -119,6 +129,12 @@ void Window::set_mouse_anchored(bool anchored)
     m_mouse_anchored = anchored;
 }
 
+bool Window::is_key_pressed(Keyboard::Key key)
+{
+    return glfwGetKey(m_window, details::convert_key(key)) == GLFW_PRESS;
+}
+
+
 bool Window::should_close()
 {
     return glfwWindowShouldClose(m_window);
@@ -127,7 +143,6 @@ bool Window::should_close()
 void Window::handle_events()
 {
     glfwPollEvents();
-    m_key_input_callback(m_window);
 
     if(m_mouse_anchored)
     {
@@ -142,5 +157,9 @@ void Window::center_mouse()
     m_mouse_y = m_height / 2.0;
 }
 
+void Window::close()
+{
+    glfwSetWindowShouldClose(m_window, true);
+}
 
 }

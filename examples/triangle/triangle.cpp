@@ -41,13 +41,8 @@ GLuint get_triangle_vao()
 
 int main(int argc, char* argv[]) 
 {
-    auto key_input_callback = [](GLFWwindow* window){
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
-    };
 
     Window window(WIDTH, HEIGHT);
-    window.set_key_input_callback(key_input_callback);
     window.init();
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
@@ -68,6 +63,9 @@ int main(int argc, char* argv[])
 
     while(!window.should_close())
     {
+        if(window.is_key_pressed(Keyboard::Escape))
+            window.close();
+            
         window.handle_events();
 
         renderer.add_render_command(triangle_render_command);
