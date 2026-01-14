@@ -13,24 +13,23 @@ namespace egen
 class Window 
 {
 public:
+    friend class Renderer;
 
     Window(float width, float heigh);
 
     int init();
     void terminate();
-    GLFWwindow* get();
+    bool should_close();
+    void handle_events();
+    void close();
 
     void set_key_input_callback(std::function<void(Keyboard::Key key, Keyboard::Action action, Keyboard::Mods mods)> key_input_callback);
     void set_mouse_input_callback(std::function<void(float x, float y, float dx, float dy)> mouse_input_callback);
     void set_mouse_anchored(bool anchored);
     bool is_key_pressed(Keyboard::Key key);
 
-    bool should_close();
-    void handle_events();
-
-    void close();
-
 private:
+    GLFWwindow* get();
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     void center_mouse();
 

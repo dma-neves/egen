@@ -15,11 +15,9 @@ void Window::framebuffer_size_callback(GLFWwindow* m_window, int width, int heig
 
 int Window::init()
 {
-    // OpenGL is operating system agnostic. In order to obtain a m_window and context to draw to, we'll use GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // Telling GLFW we want to use the core-profile means we'll get access to a smaller subset of OpenGL features without backwards-compatible features we no longer need.
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
@@ -33,23 +31,21 @@ int Window::init()
     }
     glfwMakeContextCurrent(m_window);
 
-    // Since there are many different versions of OpenGL drivers, the location of most of its functions is not known at compile-time and needs to be queried at run-time.
-    // GLAD solves this for us
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         throw std::runtime_error("Failed to initialize GLAD");
         return -1;
     }
 
-    glViewport(0, 0, m_width, m_height); // viewport is used to transform Normalized Device Coordinates (NDC) to screen coordinates
+    glViewport(0, 0, m_width, m_height);
 
-    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback); // Callback for change in m_window size
+    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
 
-    glEnable(GL_DEPTH_TEST); // Enable depth testing
+    glEnable(GL_DEPTH_TEST);
 
-    glfwSetWindowUserPointer(m_window, this); // Bind this pointer to window user pointer
+    glfwSetWindowUserPointer(m_window, this);
 
-    glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int focused) { // Callback when window comes to focus
+    glfwSetWindowFocusCallback(m_window, [](GLFWwindow* window, int focused) {
         auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
         if (focused)
         {

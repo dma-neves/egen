@@ -7,11 +7,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace egen::primitives
+namespace egen
 {
-    GLuint cube()
+    class Cube
     {
-        static float vertices[] = {
+    public:
+        static Cube& get_instance();
+
+        GLuint vao();
+        uint32_t index_count();
+
+    private:
+
+        GLuint m_vao;
+
+        void compute_vao();
+
+        static constexpr float vertices[] = {
                 // front
                 -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
                 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
@@ -44,7 +56,7 @@ namespace egen::primitives
                 -0.5f, -0.5f, -0.5f, 0.3f, 0.3f, 0.3f 
         };
 
-        static unsigned int indices[] =  {
+        static constexpr unsigned int indices[] =  {
             // front
             0, 1, 2, // first triangle
             2, 3, 0, // second triangle
@@ -69,29 +81,5 @@ namespace egen::primitives
             20, 21, 22, // first triangle
             22, 23, 20  // second triangle
         };
-
-        GLuint VBO, EBO, VAO;
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(VAO);
-
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);   // Unbind VBO
-        glBindVertexArray(0);               // Unbind VAO
-
-        return VAO;
-    }
+    };
 }

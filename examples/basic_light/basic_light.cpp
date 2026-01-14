@@ -53,57 +53,40 @@ void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, 
 
 std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& light_shader)
 {
-    GLuint cube_vao = primitives::cube();
+    std::vector<glm::mat4> models = {
+        glm::mat4(1.0f),
+        glm::translate(glm::mat4(1.0f), glm::vec3(1.8f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+        glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.5f, -0.3f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 0.3f, 0.2f)),
+        glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 3.0f)),  glm::vec3(0.2f))
+    };
 
-    glm::mat4 model1 = glm::mat4(1.0f);
-    glm::mat4 model2 = glm::translate(glm::mat4(1.0f), glm::vec3(1.8f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 model3 = glm::translate(glm::mat4(1.0f), glm::vec3(-1.5f, 0.5f, -0.3f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 0.3f, 0.2f));
-
-    glm::mat4 light_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 3.0f));
-    light_model = glm::scale(light_model, glm::vec3(0.2f));
-
-    glm::vec3 light_pos = glm::vec3(light_model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    constexpr uint16_t light_model_index = 3;
+    glm::vec3 light_pos = glm::vec3(models[light_model_index] * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     glm::vec3 light_color(1.f, 1.f, 1.f);
+    glm::vec3 cube_color(0.8f, 0.6f, 0.3f);
 
     light_shader.use();
     light_shader.set_uniform("color", light_color);
     cube_shader.use();
-    cube_shader.set_uniform("color", glm::vec3(0.8f, 0.6f, 0.3f));
+    cube_shader.set_uniform("color", cube_color);
     cube_shader.set_uniform("light.ambient", light_color);
     cube_shader.set_uniform("light.diffuse", light_color);
     cube_shader.set_uniform("light.specular", light_color);
     cube_shader.set_uniform("light.position", light_pos);
 
-    std::vector<Renderer::Command> render_commands = {
-        Renderer::Command{
-            .vao = cube_vao,
-            .index_count = 36,
-            .shader = &cube_shader,
+    auto& cube = Cube::get_instance();
+
+    std::vector<Renderer::Command> render_commands; 
+    for(uint16_t i = 0; i < models.size(); i++)
+    {
+        render_commands.emplace_back(Renderer::Command{
+            .vao = cube.vao(),
+            .index_count = cube.index_count(),
+            .shader = (i == light_model_index) ? &light_shader : &cube_shader,
             .texture = nullptr,
-            .model = model1
-        },
-        Renderer::Command{
-            .vao = cube_vao,
-            .index_count = 36,
-            .shader = &cube_shader,
-            .texture = nullptr,
-            .model = model2
-        },
-        Renderer::Command{
-            .vao = cube_vao,
-            .index_count = 36,
-            .shader = &cube_shader,
-            .texture = nullptr,
-            .model = model3
-        },
-        Renderer::Command{
-            .vao = cube_vao,
-            .index_count = 36,
-            .shader = &light_shader,
-            .texture = nullptr,
-            .model = light_model
-        }
-    };
+            .model = models[i]
+        });
+    }
 
     return render_commands;
 }
@@ -151,5 +134,6 @@ int main(int argc, char* argv[])
         rotate_light(render_commands[render_commands.size()-1], cube_shader, dt);
     }
 
+    window.terminate();
     return 0;
 }

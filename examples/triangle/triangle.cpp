@@ -72,5 +72,6 @@ int main(int argc, char* argv[])
         renderer.flush();
     }
 
+    window.terminate();
     return 0;
 }

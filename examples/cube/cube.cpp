@@ -54,11 +54,11 @@ int main(int argc, char* argv[])
     std::filesystem::path vertex_shader_path = "../examples/cube/shaders/cube.vert";
     std::filesystem::path fragment_shader_path = "../examples/cube/shaders/cube.frag";
     Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
-    GLuint cube_vao = primitives::cube();
+    auto& cube = Cube::get_instance();
 
-    Renderer::Command cube_render_command{
-        .vao = cube_vao,
-        .index_count = 36,
+    Renderer::Command render_command{
+        .vao = cube.vao(),
+        .index_count = cube.index_count(),
         .shader = &shader,
         .texture = nullptr
     };
@@ -68,10 +68,11 @@ int main(int argc, char* argv[])
         window.handle_events();
         process_key_input(window, angle_x, angle_y);
 
-        cube_render_command.model = compute_model(angle_x,  angle_y);
-        renderer.add_render_command(cube_render_command);
+        render_command.model = compute_model(angle_x,  angle_y);
+        renderer.add_render_command(render_command);
         renderer.flush();
     }
 
+    window.terminate();
     return 0;
 }
