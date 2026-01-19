@@ -51,7 +51,7 @@ void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, 
     cube_shader.set_uniform("light.position", light_pos);
 }
 
-std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& light_shader)
+std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& light_shader, Texture& container_texture)
 {
     std::vector<glm::mat4> models = {
         glm::mat4(1.0f),
@@ -83,7 +83,7 @@ std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& 
             .vao = cube.vao(),
             .index_count = cube.index_count(),
             .shader = (i == light_model_index) ? &light_shader : &cube_shader,
-            .texture = nullptr,
+            .texture = (i == light_model_index) ? nullptr : &container_texture,
             .model = models[i]
         });
     }
@@ -106,6 +106,13 @@ int main(int argc, char* argv[])
     Shader cube_shader(common_shader_path, cube_vertex_shader_path, cube_fragment_shader_path);
     Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
 
+    std::filesystem::path container_texture_path = "../examples/basic_light/textures/container.png";
+    Texture container_texture(container_texture_path);
+
+    cube_shader.use();
+    glBindTexture(GL_TEXTURE_2D, container_texture.get());
+    cube_shader.set_uniform("tex_sampler", 0);
+
     float dt = 0.f;
     float last_frame = 0.f;
 
@@ -114,7 +121,7 @@ int main(int argc, char* argv[])
     });
     window.set_mouse_anchored(true);
 
-    auto render_commands = get_render_commands(cube_shader, light_shader);
+    auto render_commands = get_render_commands(cube_shader, light_shader, container_texture);
 
     while(!window.should_close())
     {

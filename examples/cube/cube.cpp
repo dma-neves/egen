@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
     std::filesystem::path vertex_shader_path = "../examples/cube/shaders/cube.vert";
     std::filesystem::path fragment_shader_path = "../examples/cube/shaders/cube.frag";
     Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
+    shader.set_uniform("color", glm::vec3(0.0, 0.4, 0.4));
     auto& cube = Cube::get_instance();
 
     Renderer::Command render_command{

@@ -27,6 +27,11 @@ void Renderer::flush()
         render_command.shader->set_uniform("mvp", mvp);
         render_command.shader->set_uniform("model", render_command.model);
         render_command.shader->set_uniform("view_pos", m_camera.get_position());
+        if(render_command.texture != nullptr)
+        {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, render_command.texture->get());
+        }
         glBindVertexArray(render_command.vao);
         glDrawElements(GL_TRIANGLES, render_command.index_count, GL_UNSIGNED_INT, 0);
     }

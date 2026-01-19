@@ -18,7 +18,6 @@ struct Light
 };
 
 uniform vec3 view_pos;
-
 uniform Material material;
 uniform Light light;
 

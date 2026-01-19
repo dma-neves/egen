@@ -40,8 +40,8 @@ make
 |  ✅   | Shader Component                      | Component to load & compile shaders                   |
 |  ✅   | Basic Renderer                        | Render Basic VAOs, and handle model matrices          |
 |  ✅   | Camera                                | Camera that handles projection and movement           |
-|       | Textures                              | Texture support                                       |
-|       | Basic Lighting                        | Support for colors, materials, light maps, etc        |
+|  ✅   | Textures                              | Texture support                                       |
+|  ☑️   | Basic Lighting                        | Support for colors, materials, light maps, etc        |
 |       | Model Loading                         | Support for loading models (ex: gltf)                 |
 |       | Complex Object component              | Object component with  hierarchical modeling          |
 |       | ECS                                   | Entity Component System                               |
