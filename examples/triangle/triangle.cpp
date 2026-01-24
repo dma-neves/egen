@@ -1,5 +1,6 @@
 #include "egen/window/Window.hpp"
 #include "egen/renderer/Renderer.hpp"
+#include "egen/filesystem/vfs.hpp"
 
 using namespace egen;
 
@@ -47,12 +48,13 @@ int main(int argc, char* argv[])
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
 
+    VFS vfs;
+    vfs.mount("user-shaders", "../examples/triangle/shaders/");
     
-    std::filesystem::path common_shader_path = "../src/egen/shaders";
-    std::filesystem::path vertex_shader_path = "../examples/triangle/shaders/triangle.vert";
-    std::filesystem::path fragment_shader_path = "../examples/triangle/shaders/triangle.frag";
+    std::string vertex_shader_path = "user-shaders://triangle.vert";
+    std::string fragment_shader_path = "user-shaders://triangle.frag";
 
-    Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
+    Shader shader(NONE_COMMON_SHADER, vfs, vertex_shader_path, fragment_shader_path);
 
     Renderer::Command triangle_render_command{
         .vao = get_triangle_vao(),

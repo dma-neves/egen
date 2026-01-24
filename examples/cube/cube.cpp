@@ -50,10 +50,15 @@ int main(int argc, char* argv[])
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
 
-    std::filesystem::path common_shader_path = "../src/egen/shaders";
-    std::filesystem::path vertex_shader_path = "../examples/cube/shaders/cube.vert";
-    std::filesystem::path fragment_shader_path = "../examples/cube/shaders/cube.frag";
-    Shader shader(common_shader_path, vertex_shader_path, fragment_shader_path);
+    VFS vfs;
+    vfs.mount("common-shaders", "../src/egen/shaders/");
+    vfs.mount("user-shaders", "../examples/cube/shaders/");
+    
+    std::string vertex_shader_path = "user-shaders://cube.vert";
+    std::string fragment_shader_path = "user-shaders://cube.frag";
+
+    Shader shader(MVP_VERT | COLOR_FRAG, vfs, vertex_shader_path, fragment_shader_path);
+
     shader.set_uniform("color", glm::vec3(0.0, 0.4, 0.4));
     auto& cube = Cube::get_instance();
 

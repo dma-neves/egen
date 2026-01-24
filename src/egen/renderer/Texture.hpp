@@ -1,17 +1,16 @@
 #pragma once
 
-#include <filesystem>
-
 #include "platform/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 
+#include "egen/filesystem/vfs.hpp"
 
 namespace egen
 {
 class Texture
 {
 public:
-    Texture(const std::filesystem::path& texture_path);
+    Texture(const VFS& vfs, const std::string& texture_path);
 
     GLuint get();
 

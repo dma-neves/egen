@@ -7,47 +7,85 @@
 namespace egen
 {
 
-static std::string load_file(const std::filesystem::path& path)
+Shader::Shader(std::uint8_t common_shader_bitfield, const VFS& vfs, const std::string& vertex_shader_path, const std::string& fragment_shader_path)
 {
-    std::ifstream file(path, std::ios::in | std::ios::binary);
-    if(!file)
+    if(common_shader_bitfield != 0x0 && !vfs.is_mounted("common-shaders"))
     {
-        throw std::runtime_error("Failed to open shader file: " + path.string());
+        throw std::runtime_error("common-shaders must be mounted on vfs");
     }
 
-    std::ostringstream oss;
-    oss << file.rdbuf();
-    return oss.str();
+    File user_vertex_shader = vfs.open(vertex_shader_path);
+    File user_fragment_shader = vfs.open(fragment_shader_path);
+
+    std::vector<GLuint> shaders = {
+        compile_shader(GL_VERTEX_SHADER, user_vertex_shader),
+        compile_shader(GL_FRAGMENT_SHADER, user_fragment_shader)
+    };
+
+    if(common_shader_bitfield & MVP_VERT)
+    {
+        File mvp_vert_shader = vfs.open("common-shaders://mvp.vert");
+        shaders.push_back(compile_shader(GL_VERTEX_SHADER, mvp_vert_shader));
+    }
+    if(common_shader_bitfield & COLOR_FRAG)
+    {
+        File color_frag_shader = vfs.open("common-shaders://color.frag");
+        shaders.push_back(compile_shader(GL_FRAGMENT_SHADER, color_frag_shader));
+    }
+    if(common_shader_bitfield & TEXTURE_FRAG)
+    {
+        File texture_frag_shader = vfs.open("common-shaders://texture.frag");
+        shaders.push_back(compile_shader(GL_FRAGMENT_SHADER, texture_frag_shader));
+    }
+    if(common_shader_bitfield & LIGHT_FRAG)
+    {
+        File light_frag_shader = vfs.open("common-shaders://light.frag");
+        shaders.push_back(compile_shader(GL_FRAGMENT_SHADER, light_frag_shader));
+    }
+
+    create_program(shaders);
+
+    if(common_shader_bitfield & LIGHT_FRAG)
+    {
+        set_uniform("material.ambient", default_ambient);
+        set_uniform("material.diffuse", default_diffuse);
+        set_uniform("material.specular", default_specular);
+        set_uniform("material.shininess", default_shininess);
+    }
 }
 
-Shader::Shader(const std::filesystem::path& common_shader_path, const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path)
+void Shader::create_program(std::vector<GLuint> shaders)
 {
+    int success;
+    char info_log[512];
+    m_shader_program = glCreateProgram();
 
-    std::filesystem::path common_vertex_shader_path = common_shader_path/"common.vert";
-    std::filesystem::path common_fragment_shader_path = common_shader_path/"common.frag";
-    std::filesystem::path common_light_fragment_shader_path = common_shader_path/"light.frag";
+    for(GLuint shader : shaders)
+        glAttachShader(m_shader_program, shader);
 
-    create_program(
-        compile_shader(GL_VERTEX_SHADER, common_vertex_shader_path),
-        compile_shader(GL_VERTEX_SHADER, vertex_shader_path),
-        compile_shader(GL_FRAGMENT_SHADER, common_fragment_shader_path),
-        compile_shader(GL_FRAGMENT_SHADER, common_light_fragment_shader_path),
-        compile_shader(GL_FRAGMENT_SHADER, fragment_shader_path)
-    );
-
-    set_uniform("material.ambient", default_ambient);
-    set_uniform("material.diffuse", default_diffuse);
-    set_uniform("material.specular", default_specular);
-    set_uniform("material.shininess", default_shininess);
-
+    glLinkProgram(m_shader_program);
+    glGetProgramiv(m_shader_program, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(m_shader_program, 512, NULL, info_log);
+        throw std::runtime_error(std::string("Failed to link shader program: ") + info_log);
+    }
+    // Activate the Shader Program
+    glUseProgram(m_shader_program);
+    // After the shaders have been linked to the program, we can delete them
+    for(GLuint shader : shaders)
+        glDeleteShader(shader);
 }
 
-GLuint Shader::compile_shader(GLenum shader_type, const std::filesystem::path& shader_path)
+GLuint Shader::compile_shader(GLenum shader_type, const File& shader_file)
 {
-    std::string shader_source = load_file(shader_path);
-    const char* shader_source_c_str = shader_source.c_str();
+    std::vector<char> shader_source(shader_file.size() + 1);
+    shader_file.read(shader_source.data(), shader_file.size());
+    shader_source.back() = '\0';
+    const GLchar* source = shader_source.data();
+    
     GLuint shader_id = glCreateShader(shader_type);
-    glShaderSource(shader_id, 1, &shader_source_c_str, NULL);
+    glShaderSource(shader_id, 1, &source, NULL);
 
     int success;
     char info_log[512];
@@ -56,7 +94,7 @@ GLuint Shader::compile_shader(GLenum shader_type, const std::filesystem::path& s
     if (!success)
     {
         glGetShaderInfoLog(shader_id, 512, NULL, info_log);
-        throw std::runtime_error(std::string("Failed to compile ") + shader_path.string() + ": " + info_log);
+        throw std::runtime_error(std::string("Failed to compile ") + shader_file.path() + ": " + info_log);
     }
 
     return shader_id;

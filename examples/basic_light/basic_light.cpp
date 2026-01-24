@@ -98,16 +98,21 @@ int main(int argc, char* argv[])
     Camera camera(WIDTH, HEIGHT);
     Renderer renderer(window, camera);
 
-    std::filesystem::path common_shader_path = "../src/egen/shaders";
-    std::filesystem::path cube_vertex_shader_path = "../examples/basic_light/shaders/cube.vert";
-    std::filesystem::path cube_fragment_shader_path = "../examples/basic_light/shaders/cube.frag";
-    std::filesystem::path light_vertex_shader_path = "../examples/basic_light/shaders/light.vert";
-    std::filesystem::path light_fragment_shader_path = "../examples/basic_light/shaders/light.frag";
-    Shader cube_shader(common_shader_path, cube_vertex_shader_path, cube_fragment_shader_path);
-    Shader light_shader(common_shader_path, light_vertex_shader_path, light_fragment_shader_path);
+    VFS vfs;
+    vfs.mount("common-shaders", "../src/egen/shaders/");
+    vfs.mount("user-shaders", "../examples/basic_light/shaders/");
+    vfs.mount("assets", "../examples/basic_light/textures/");
+    
+    std::string cube_vertex_shader_path = "user-shaders://cube.vert";
+    std::string cube_fragment_shader_path = "user-shaders://cube.frag";
+    std::string light_vertex_shader_path = "user-shaders://light.vert";
+    std::string light_fragment_shader_path = "user-shaders://light.frag";
 
-    std::filesystem::path container_texture_path = "../examples/basic_light/textures/container.png";
-    Texture container_texture(container_texture_path);
+    Shader cube_shader(MVP_VERT | TEXTURE_FRAG | LIGHT_FRAG, vfs, cube_vertex_shader_path, cube_fragment_shader_path);
+    Shader light_shader(MVP_VERT | COLOR_FRAG, vfs, light_vertex_shader_path, light_fragment_shader_path);
+
+    std::string container_texture_path = "assets://container.png";
+    Texture container_texture(vfs, container_texture_path);
 
     cube_shader.use();
     glBindTexture(GL_TEXTURE_2D, container_texture.get());

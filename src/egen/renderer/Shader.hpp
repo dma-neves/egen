@@ -1,6 +1,5 @@
 #pragma once
 
-#include <filesystem>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -9,6 +8,13 @@
 #include <GLFW/glfw3.h>
 
 #include "egen/renderer/details/Uniform.hpp"
+#include "egen/filesystem/vfs.hpp"
+
+#define NONE_COMMON_SHADER 0x0
+#define MVP_VERT 0x1
+#define COLOR_FRAG 0x2
+#define TEXTURE_FRAG 0x3
+#define LIGHT_FRAG 0x4
 
 namespace egen
 {
@@ -16,7 +22,8 @@ namespace egen
 class Shader
 {
 public:
-    Shader(const std::filesystem::path& common_shader_path, const std::filesystem::path& vertex_shader_path, const std::filesystem::path& fragment_shader_path);
+
+    Shader(std::uint8_t common_shader_bitfield, const VFS& vfs, const std::string& vertex_shader_path, const std::string& fragment_shader_path);
 
     GLuint program();
     void use();
@@ -34,34 +41,13 @@ public:
     }
 
 private:
-    GLuint compile_shader(GLenum shader_type, const std::filesystem::path& shader_path);
-    void create_program(std::vector<GLuint>&& shaders);
-
-    template <typename... ShaderIds>
-    void create_program(ShaderIds... shaders)
-    {
-        int success;
-        char info_log[512];
-        m_shader_program = glCreateProgram();
-
-        (glAttachShader(m_shader_program, shaders), ...);
-
-        glLinkProgram(m_shader_program);
-        glGetProgramiv(m_shader_program, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(m_shader_program, 512, NULL, info_log);
-            throw std::runtime_error(std::string("Failed to link shader program: ") + info_log);
-        }
-        // Activate the Shader Program
-        glUseProgram(m_shader_program);
-        // After the shaders have been linked to the program, we can delete them
-        (glDeleteShader(shaders), ...);
-    }
+    GLuint compile_shader(GLenum shader_type, const File& shader_file);
+    void create_program(std::vector<GLuint> shaders);
+    GLint get_uniform_location(const std::string& name);
 
     GLuint m_shader_program;
     std::unordered_map<std::string, GLint> m_uniform_cache;
-    GLint get_uniform_location(const std::string& name);
+
 
     static constexpr glm::vec3 default_ambient = glm::vec3(0.1f);
     static constexpr glm::vec3 default_diffuse  = glm::vec3(0.8f);
