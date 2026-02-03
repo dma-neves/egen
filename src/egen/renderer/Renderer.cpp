@@ -27,10 +27,23 @@ void Renderer::flush()
         render_command.shader->set_uniform("mvp", mvp);
         render_command.shader->set_uniform("model", render_command.model);
         render_command.shader->set_uniform("view_pos", m_camera.get_position());
-        if(render_command.texture != nullptr)
+        if(render_command.material != nullptr)
         {
+            render_command.shader->set_uniform("shininess", render_command.material->shininess);
+
+            if(render_command.material->diffuse == nullptr)
+            {
+                throw std::runtime_error("Found Material without diffuse texture");
+            }
+            
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, render_command.texture->get());
+            glBindTexture(GL_TEXTURE_2D, render_command.material->diffuse->get());
+
+            if(render_command.material->specular != nullptr)
+            {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, render_command.material->specular->get());
+            }
         }
         glBindVertexArray(render_command.vao);
         glDrawElements(GL_TRIANGLES, render_command.index_count, GL_UNSIGNED_INT, 0);

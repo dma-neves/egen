@@ -27,16 +27,6 @@ Shader::Shader(std::uint8_t common_shader_bitfield, const VFS& vfs, const std::s
         File mvp_vert_shader = vfs.open("common-shaders://mvp.vert");
         shaders.push_back(compile_shader(GL_VERTEX_SHADER, mvp_vert_shader));
     }
-    if(common_shader_bitfield & COLOR_FRAG)
-    {
-        File color_frag_shader = vfs.open("common-shaders://color.frag");
-        shaders.push_back(compile_shader(GL_FRAGMENT_SHADER, color_frag_shader));
-    }
-    if(common_shader_bitfield & TEXTURE_FRAG)
-    {
-        File texture_frag_shader = vfs.open("common-shaders://texture.frag");
-        shaders.push_back(compile_shader(GL_FRAGMENT_SHADER, texture_frag_shader));
-    }
     if(common_shader_bitfield & LIGHT_FRAG)
     {
         File light_frag_shader = vfs.open("common-shaders://light.frag");
@@ -44,14 +34,6 @@ Shader::Shader(std::uint8_t common_shader_bitfield, const VFS& vfs, const std::s
     }
 
     create_program(shaders);
-
-    if(common_shader_bitfield & LIGHT_FRAG)
-    {
-        set_uniform("material.ambient", default_ambient);
-        set_uniform("material.diffuse", default_diffuse);
-        set_uniform("material.specular", default_specular);
-        set_uniform("material.shininess", default_shininess);
-    }
 }
 
 void Shader::create_program(std::vector<GLuint> shaders)

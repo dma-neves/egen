@@ -57,8 +57,9 @@ int main(int argc, char* argv[])
     std::string vertex_shader_path = "user-shaders://cube.vert";
     std::string fragment_shader_path = "user-shaders://cube.frag";
 
-    Shader shader(MVP_VERT | COLOR_FRAG, vfs, vertex_shader_path, fragment_shader_path);
+    Shader shader(MVP_VERT, vfs, vertex_shader_path, fragment_shader_path);
 
+    shader.use();
     shader.set_uniform("color", glm::vec3(0.0, 0.4, 0.4));
     auto& cube = Cube::get_instance();
 
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
         .vao = cube.vao(),
         .index_count = cube.index_count(),
         .shader = &shader,
-        .texture = nullptr
+        .material = nullptr
     };
 
     while(!window.should_close())

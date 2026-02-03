@@ -12,9 +12,7 @@
 
 #define NONE_COMMON_SHADER 0x0
 #define MVP_VERT 0x1
-#define COLOR_FRAG 0x2
-#define TEXTURE_FRAG 0x3
-#define LIGHT_FRAG 0x4
+#define LIGHT_FRAG 0x2
 
 namespace egen
 {
@@ -47,12 +45,6 @@ private:
 
     GLuint m_shader_program;
     std::unordered_map<std::string, GLint> m_uniform_cache;
-
-
-    static constexpr glm::vec3 default_ambient = glm::vec3(0.1f);
-    static constexpr glm::vec3 default_diffuse  = glm::vec3(0.8f);
-    static constexpr glm::vec3 default_specular = glm::vec3(0.5f);
-    static constexpr float default_shininess = 32.f;
 };
 
 }

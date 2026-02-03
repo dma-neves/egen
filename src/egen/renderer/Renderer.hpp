@@ -2,7 +2,7 @@
 
 #include "egen/window/Window.hpp"
 #include "egen/renderer/Shader.hpp"
-#include "egen/renderer/Texture.hpp"
+#include "egen/renderer/Material.hpp"
 #include "egen/renderer/Camera.hpp"
 
 #include <glm/glm.hpp>
@@ -22,7 +22,7 @@ public:
         uint32_t vao;
         uint32_t index_count;
         Shader* shader;
-        Texture* texture;
+        Material* material;
         glm::mat4 model{1.0f};
     };
 

@@ -1,12 +1,12 @@
 #version 330 core
 
-struct Material
+struct PhongMaterial
 {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
     float shininess;
-}; 
+};
 
 struct Light
 {
@@ -18,10 +18,9 @@ struct Light
 };
 
 uniform vec3 view_pos;
-uniform Material material;
 uniform Light light;
 
-vec3 phong_light(vec3 frag_pos, vec3 normal)
+vec3 phong(vec3 frag_pos, vec3 normal, PhongMaterial material)
 {
     vec3 ambient = material.ambient * light.ambient;
 
@@ -33,7 +32,7 @@ vec3 phong_light(vec3 frag_pos, vec3 normal)
     vec3 view_dir = normalize(view_pos - frag_pos);
     vec3 reflect_dir = reflect(-light_dir, norm);
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
-    vec3 specular = light.specular * (spec * material.specular);  
+    vec3 specular = light.specular * (spec * material.specular);
 
     return ambient + diffuse + specular;
 }

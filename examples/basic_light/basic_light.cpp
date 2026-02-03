@@ -39,19 +39,19 @@ static void process_mouse_input(double x, double y, double dx, double dy, Camera
     camera.rotate(Camera::Rotation::Yaw, yaw);
 }
 
-void rotate_light(Renderer::Command& light_render_command, Shader& cube_shader, float dt)
+void rotate_lantern(Renderer::Command& lantern_render_command, Shader& cube_shader, float dt)
 {
     float val = 0.7f * dt;
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), val, glm::vec3(0.0f, 1.0f, 0.0f));
-    light_render_command.model = rotation * light_render_command.model;
+    lantern_render_command.model = rotation * lantern_render_command.model;
 
-    glm::vec3 light_pos = glm::vec3(light_render_command.model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    glm::vec3 lantern_pos = glm::vec3(lantern_render_command.model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
     cube_shader.use();
-    cube_shader.set_uniform("light.position", light_pos);
+    cube_shader.set_uniform("light.position", lantern_pos);
 }
 
-std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& light_shader, Texture& container_texture)
+std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& lantern_shader, Material& container_material)
 {
     std::vector<glm::mat4> models = {
         glm::mat4(1.0f),
@@ -60,19 +60,19 @@ std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& 
         glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.0f, 3.0f)),  glm::vec3(0.2f))
     };
 
-    constexpr uint16_t light_model_index = 3;
-    glm::vec3 light_pos = glm::vec3(models[light_model_index] * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-    glm::vec3 light_color(1.f, 1.f, 1.f);
+    constexpr uint16_t lantern_model_index = 3;
+    glm::vec3 lantern_pos = glm::vec3(models[lantern_model_index] * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    glm::vec3 lantern_color(1.f, 1.f, 1.f);
     glm::vec3 cube_color(0.8f, 0.6f, 0.3f);
 
-    light_shader.use();
-    light_shader.set_uniform("color", light_color);
+    lantern_shader.use();
+    lantern_shader.set_uniform("color", lantern_color);
     cube_shader.use();
     cube_shader.set_uniform("color", cube_color);
-    cube_shader.set_uniform("light.ambient", light_color);
-    cube_shader.set_uniform("light.diffuse", light_color);
-    cube_shader.set_uniform("light.specular", light_color);
-    cube_shader.set_uniform("light.position", light_pos);
+    cube_shader.set_uniform("light.ambient", lantern_color);
+    cube_shader.set_uniform("light.diffuse", lantern_color);
+    cube_shader.set_uniform("light.specular", lantern_color);
+    cube_shader.set_uniform("light.position", lantern_pos);
 
     auto& cube = Cube::get_instance();
 
@@ -82,8 +82,8 @@ std::vector<Renderer::Command> get_render_commands(Shader& cube_shader, Shader& 
         render_commands.emplace_back(Renderer::Command{
             .vao = cube.vao(),
             .index_count = cube.index_count(),
-            .shader = (i == light_model_index) ? &light_shader : &cube_shader,
-            .texture = (i == light_model_index) ? nullptr : &container_texture,
+            .shader = (i == lantern_model_index) ? &lantern_shader : &cube_shader,
+            .material = (i == lantern_model_index) ? nullptr : &container_material,
             .model = models[i]
         });
     }
@@ -105,18 +105,27 @@ int main(int argc, char* argv[])
     
     std::string cube_vertex_shader_path = "user-shaders://cube.vert";
     std::string cube_fragment_shader_path = "user-shaders://cube.frag";
-    std::string light_vertex_shader_path = "user-shaders://light.vert";
-    std::string light_fragment_shader_path = "user-shaders://light.frag";
+    std::string lantern_vertex_shader_path = "user-shaders://lantern.vert";
+    std::string lantern_fragment_shader_path = "user-shaders://lantern.frag";
 
-    Shader cube_shader(MVP_VERT | TEXTURE_FRAG | LIGHT_FRAG, vfs, cube_vertex_shader_path, cube_fragment_shader_path);
-    Shader light_shader(MVP_VERT | COLOR_FRAG, vfs, light_vertex_shader_path, light_fragment_shader_path);
+    Shader cube_shader(MVP_VERT | LIGHT_FRAG, vfs, cube_vertex_shader_path, cube_fragment_shader_path);
+    Shader lantern_shader(MVP_VERT, vfs, lantern_vertex_shader_path, lantern_fragment_shader_path);
 
     std::string container_texture_path = "assets://container.png";
+    std::string container_specular_texture_path = "assets://container_specular.png";
     Texture container_texture(vfs, container_texture_path);
+    Texture container_specular_texture(vfs, container_specular_texture_path);
 
+    Material container_material {
+        .diffuse = &container_texture,
+        .specular = &container_specular_texture,
+        .shininess = 32.f
+    };
+
+    // TODO: How to avoid setting the texture unit ids here (since they are hardcoded in renderer)
     cube_shader.use();
-    glBindTexture(GL_TEXTURE_2D, container_texture.get());
-    cube_shader.set_uniform("tex_sampler", 0);
+    cube_shader.set_uniform("diffuse", 0);
+    cube_shader.set_uniform("specular", 1);
 
     float dt = 0.f;
     float last_frame = 0.f;
@@ -126,7 +135,7 @@ int main(int argc, char* argv[])
     });
     window.set_mouse_anchored(true);
 
-    auto render_commands = get_render_commands(cube_shader, light_shader, container_texture);
+    auto render_commands = get_render_commands(cube_shader, lantern_shader, container_material);
 
     while(!window.should_close())
     {
@@ -143,7 +152,7 @@ int main(int argc, char* argv[])
         }
         renderer.flush();
 
-        rotate_light(render_commands[render_commands.size()-1], cube_shader, dt);
+        rotate_lantern(render_commands[render_commands.size()-1], cube_shader, dt);
     }
 
     window.terminate();
