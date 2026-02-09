@@ -1,6 +1,6 @@
 #include "egen/window/Window.hpp"
 #include "egen/renderer/Renderer.hpp"
-#include "egen/filesystem/vfs.hpp"
+#include "egen/filesystem/VFS.hpp"
 #include "egen/renderer/primitives/triangle.hpp"
 
 using namespace egen;

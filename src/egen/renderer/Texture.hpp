@@ -3,7 +3,7 @@
 #include "platform/glad/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 
-#include "egen/filesystem/vfs.hpp"
+#include "egen/filesystem/VFS.hpp"
 
 namespace egen
 {

@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 
 #include "egen/renderer/details/Uniform.hpp"
-#include "egen/filesystem/vfs.hpp"
+#include "egen/filesystem/VFS.hpp"
 
 #define NONE_COMMON_SHADER 0x0
 #define MVP_VERT 0x1

@@ -1,4 +1,4 @@
-#include "egen/filesystem/vfs.hpp"
+#include "egen/filesystem/VFS.hpp"
 
 namespace egen
 {

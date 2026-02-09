@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "egen/filesystem/file.hpp"
+#include "egen/filesystem/File.hpp"
 
 namespace egen
 {
